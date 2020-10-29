@@ -36,7 +36,7 @@ class FileRepository
                 'source_file' => $queryBuilder->createNamedParameter($task->getSourceFile()->getUid(), \PDO::PARAM_INT),
                 'task_type' => $queryBuilder->createNamedParameter($task->getType()),
                 'task_name' => $queryBuilder->createNamedParameter($task->getName()),
-                'configuration' => $queryBuilder->createNamedParameter(json_encode($task->getConfiguration())),
+                'configuration' => $queryBuilder->createNamedParameter(serialize($task->getConfiguration())),
                 'checksum' => $queryBuilder->createNamedParameter($task->getConfigurationChecksum())
             ], false);
 

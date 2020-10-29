@@ -20,7 +20,7 @@ class ImageProcessor implements MiddlewareInterface
 
         if (($processingInstructions = FileRepository::getProcessingInstructionsByUrl($path)) !== false) {
             $storage = GeneralUtility::makeInstance(StorageRepository::class)->findByUid($processingInstructions['storage']);
-            $configuration = json_decode($processingInstructions['configuration'], true);
+            $configuration = unserialize($processingInstructions['configuration']);
             $configuration['deferred'] = true;
             $processedFile = $storage->processFile(
                 GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($processingInstructions['source_file']),

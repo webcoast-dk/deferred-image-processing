@@ -39,6 +39,11 @@ class DeferredImageProcessor extends LocalImageProcessor
             }
 
             if (!FileRepository::hasProcessingInstructions($task)) {
+                // If we got an empty processed file (not persisted yet), set the name
+                // so we can get the public url of the processed image.
+                if (!$task->getTargetFile()->isPersisted()) {
+                    $task->getTargetFile()->setName($task->getTargetFileName());
+                }
                 FileRepository::setProcessingInstructions($task);
             }
 
