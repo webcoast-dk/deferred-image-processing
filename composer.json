@@ -1,0 +1,22 @@
+{
+    "name": "webcoast/deferred-image-processing",
+    "description": "Handles image processing on request instead of during page generation",
+    "type": "typo3-cms-extension",
+    "license": "GPL-3.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "WEBcoast\\DeferredImageProcessing\\": "Classes/"
+        }
+    },
+    "require": {
+        "php": "^7.2.0",
+        "typo3/cms-core": "^v10.4.6"
+    }
+}
