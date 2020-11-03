@@ -3,6 +3,7 @@
 namespace WEBcoast\DeferredImageProcessing\Resource\Processing;
 
 use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
+use TYPO3\CMS\Core\Imaging\ImageManipulation\Area;
 use TYPO3\CMS\Core\Resource\Processing\LocalImageProcessor;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 use TYPO3\CMS\Core\Resource\Processing\TaskTypeRegistry;
@@ -61,6 +62,15 @@ class DeferredImageProcessor extends LocalImageProcessor
         $graphicalFunctions = GeneralUtility::makeInstance(GraphicalFunctions::class);
         $originalFileInfo = $graphicalFunctions->getImageDimensions($task->getSourceFile()->getForLocalProcessing());
         $configuration = $task->getConfiguration();
+
+        $crop = $configuration['crop'] ?? null;
+        if ($crop instanceof Area) {
+            $crop = $crop->asArray();
+        }
+        if (isset($crop['width']) && isset($crop['height'])) {
+            $originalFileInfo[0] = $crop['width'];
+            $originalFileInfo[1] = $crop['height'];
+        }
 
         return $graphicalFunctions->getImageScale($originalFileInfo, $configuration['width'], $configuration['height'], $configuration);
     }
