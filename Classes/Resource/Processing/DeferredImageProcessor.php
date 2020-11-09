@@ -39,21 +39,27 @@ class DeferredImageProcessor extends LocalImageProcessor
                 return;
             }
 
-            if (!FileRepository::hasProcessingInstructions($task)) {
-                // If we got an empty processed file (not persisted yet), set the name
-                // so we can get the public url of the processed image.
-                if (!$task->getTargetFile()->isPersisted()) {
-                    $task->getTargetFile()->setName($task->getTargetFileName());
-                }
-                FileRepository::setProcessingInstructions($task);
-            }
-
-            $task->setExecuted(true);
             $imageDimensions = $this->getTargetDimensions($task);
-            $task->getTargetFile()->setName($task->getTargetFileName());
-            $task->getTargetFile()->updateProperties(
-                ['width' => $imageDimensions[0], 'height' => $imageDimensions[1], 'checksum' => $task->getConfigurationChecksum()]
-            );
+            if ($imageDimensions[0] === $task->getTargetFile()->getOriginalFile()->getProperty('width') && $imageDimensions[1] === $task->getTargetFile()->getOriginalFile()->getProperty('height')) {
+                // If the target image dimensions are identical to the original file, do not process, but use the original file
+                $task->setExecuted(true);
+                $task->getTargetFile()->setUsesOriginalFile();
+            } else {
+                if (!FileRepository::hasProcessingInstructions($task)) {
+                    // If we got an empty processed file (not persisted yet), set the name
+                    // so we can get the public url of the processed image.
+                    if (!$task->getTargetFile()->isPersisted()) {
+                        $task->getTargetFile()->setName($task->getTargetFileName());
+                    }
+                    FileRepository::setProcessingInstructions($task);
+                }
+
+                $task->setExecuted(true);
+                $task->getTargetFile()->setName($task->getTargetFileName());
+                $task->getTargetFile()->updateProperties(
+                    ['width' => $imageDimensions[0], 'height' => $imageDimensions[1], 'checksum' => $task->getConfigurationChecksum()]
+                );
+            }
         }
     }
 
