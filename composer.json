@@ -1,6 +1,7 @@
 {
     "name": "webcoast/deferred-image-processing",
     "description": "Handles image processing on request instead of during page generation",
+    "keywords": ["typo3", "cms", "image", "processing", "scaling", "defer", "deferred"],
     "type": "typo3-cms-extension",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
