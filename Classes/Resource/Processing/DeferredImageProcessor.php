@@ -11,7 +11,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DeferredImageProcessor extends LocalImageProcessor
 {
-    public function canProcessTask(TaskInterface $task)
+    public function canProcessTask(TaskInterface $task): bool
     {
         return $task->getType() === 'Image'
             && $task->getName() === 'CropScaleMask'
@@ -19,7 +19,7 @@ class DeferredImageProcessor extends LocalImageProcessor
             && $task->getSourceFile()->getExtension() !== 'svg';
     }
 
-    public function processTask(TaskInterface $task)
+    public function processTask(TaskInterface $task): void
     {
         if (isset($task->getConfiguration()['deferred'])) {
             $configuration = $task->getConfiguration();
