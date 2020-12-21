@@ -22,7 +22,25 @@ or from TYPO3 extension repository.
 
 A database update is necessary to create the processing queue table.
 
-There is nothing to configure.
+### Rewrite rules for apache
+If using the default htaccess file which is shipped with TYPO3, then there is a rule which stops all further processing
+of static files which are not found:
+
+```apacheconf
+# Stop rewrite processing, if we are in the typo3/ directory or any other known directory
+# NOTE: Add your additional local storages here
+RewriteRule ^(?:typo3/|fileadmin/|typo3conf/|typo3temp/|uploads/|favicon\.ico) - [L]
+```
+
+But for this extension to work the request needs to be redirected to index.php and is then handled by a middleware.
+So make sure to add a rule like this *before* the blocking rule above:
+
+```apacheconf
+# For EXT:deferred-image-processing
+# If a processed image is not found, then redirect to index.php and let the middleware create one on the fly.
+RewriteCond %{DOCUMENT_ROOT}/$1.$3 !-f
+RewriteRule ^((fileadmin/_processed_|other-storage/_processed_)/.+)\.(gif|jpg|jpeg|png)$ %{ENV:CWD}index.php [L]
+```
 
 ## Documentation
 
