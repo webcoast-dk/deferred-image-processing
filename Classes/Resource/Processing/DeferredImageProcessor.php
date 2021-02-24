@@ -66,7 +66,7 @@ class DeferredImageProcessor extends LocalImageProcessor
     protected function getTargetDimensions(TaskInterface $task)
     {
         $graphicalFunctions = GeneralUtility::makeInstance(GraphicalFunctions::class);
-        $originalFileInfo = $graphicalFunctions->getImageDimensions($task->getSourceFile()->getForLocalProcessing());
+        $originalFileInfo = $graphicalFunctions->getImageDimensions($task->getSourceFile()->getForLocalProcessing(false));
         $configuration = $task->getConfiguration();
 
         $crop = $configuration['crop'] ?? null;
