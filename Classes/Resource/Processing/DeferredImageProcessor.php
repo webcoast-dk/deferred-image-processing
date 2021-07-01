@@ -20,7 +20,7 @@ class DeferredImageProcessor extends LocalImageProcessor
 
     public function processTask(TaskInterface $task): void
     {
-        if (isset($task->getConfiguration()['deferred'])) {
+        if (isset($task->getConfiguration()['deferred']) || !$task->getTargetFile()->getStorage()->isPublic()) {
             $configuration = $task->getConfiguration();
             unset($configuration['deferred']);
             $localTask = GeneralUtility::makeInstance(TaskTypeRegistry::class)->getTaskForType($task->getType() . '.' . $task->getName(), $task->getTargetFile(), $configuration);
