@@ -2,6 +2,8 @@
 
 namespace WEBcoast\DeferredImageProcessing\Resource\Processing;
 
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Imaging\ImageDimension;
 use TYPO3\CMS\Core\Resource\Processing\LocalImageProcessor;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
@@ -20,7 +22,7 @@ class DeferredImageProcessor extends LocalImageProcessor
 
     public function processTask(TaskInterface $task): void
     {
-        if (isset($task->getConfiguration()['deferred']) || !$task->getTargetFile()->getStorage()->isPublic()) {
+        if (!$this->shouldDefer($task)) {
             $configuration = $task->getConfiguration();
             unset($configuration['deferred']);
             $localTask = GeneralUtility::makeInstance(TaskTypeRegistry::class)->getTaskForType($task->getType() . '.' . $task->getName(), $task->getTargetFile(), $configuration);
@@ -60,5 +62,34 @@ class DeferredImageProcessor extends LocalImageProcessor
                 );
             }
         }
+    }
+
+    /**
+     * Do not defer image rendering under the following circumstances:
+     * * the processing is started from a deferred processing task
+     * * the target file's storage is not public
+     * * the deferred file processing has been disabled, e.g. inside the GIFBUILDER
+     *
+     * @param TaskInterface $task
+     *
+     * @throws AspectNotFoundException
+     * @return bool
+     */
+    protected function shouldDefer(TaskInterface $task): bool
+    {
+        if (isset($task->getConfiguration()['deferred'])) {
+            return false;
+        }
+
+        if (!$task->getTargetFile()->getStorage()->isPublic()) {
+            return false;
+        }
+
+        $context = GeneralUtility::makeInstance(Context::class);
+        if ($context->hasAspect('fileProcessing') && !$context->getPropertyFromAspect('fileProcessing', 'deferProcessing')) {
+            return false;
+        }
+
+        return true;
     }
 }
