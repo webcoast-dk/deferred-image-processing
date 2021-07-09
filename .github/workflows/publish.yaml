@@ -26,7 +26,7 @@ jobs:
             - name: Get comment
               id: get-comment
               run: |
-                  comment="${{ github.event.release.body }}"
+                  comment='${{ github.event.release.body }}'
                   comment="${comment//'%'/'%25'}"
                   comment="${comment//$'\n'/'%0A'}"
                   comment="${comment//$'\r'/'%0D'}"
