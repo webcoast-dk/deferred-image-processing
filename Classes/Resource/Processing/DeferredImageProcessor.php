@@ -77,6 +77,10 @@ class DeferredImageProcessor extends LocalImageProcessor
      */
     protected function shouldDefer(TaskInterface $task): bool
     {
+        if (TYPO3_MODE === 'BE') {
+            return false;
+        }
+
         if (isset($task->getConfiguration()['deferred'])) {
             return false;
         }
