@@ -17,7 +17,9 @@ class DeferredImageProcessor extends LocalImageProcessor
         return $task->getType() === 'Image'
             && $task->getName() === 'CropScaleMask'
             && $task->getSourceFile()->getMimeType() !== 'image/svg+xml'
-            && $task->getSourceFile()->getExtension() !== 'svg';
+            && $task->getSourceFile()->getExtension() !== 'svg'
+            && $task->getSourceFile()->getMimeType() !== 'application/pdf'
+            && $task->getSourceFile()->getExtension() !== 'pdf';
     }
 
     public function processTask(TaskInterface $task): void
