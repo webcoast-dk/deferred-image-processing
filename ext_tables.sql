@@ -9,5 +9,8 @@ create table tx_deferredimageprocessing_file
     configuration text             not null,
     checksum      varchar(32)      not null,
 
-    primary key (uid)
+    primary key (uid),
+
+    key public_url (public_url),
+    key instruction (storage, source_file, task_type, task_name, checksum)
 );
