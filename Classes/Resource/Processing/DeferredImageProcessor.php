@@ -55,6 +55,9 @@ class DeferredImageProcessor extends LocalImageProcessor
                         $task->getTargetFile()->setName($task->getTargetFileName());
                     }
                     FileRepository::setProcessingInstructions($task);
+                } else {
+                    // Update the public URL to avoid missing images due to changed source file identifier
+                    FileRepository::updatePublicUrl($task);
                 }
 
                 $task->setExecuted(true);

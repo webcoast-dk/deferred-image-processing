@@ -53,6 +53,21 @@ class FileRepository
         return $queryBuilder->execute()->fetch();
     }
 
+    public static function updatePublicUrl(TaskInterface $task)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
+        $queryBuilder->update(self::TABLE)
+            ->set('public_url', $task->getTargetFile()->getPublicUrl())
+            ->where(
+                $queryBuilder->expr()->eq('storage', $queryBuilder->createNamedParameter($task->getSourceFile()->getStorage()->getUid())),
+                $queryBuilder->expr()->eq('source_file', $queryBuilder->createNamedParameter($task->getSourceFile()->getUid())),
+                $queryBuilder->expr()->eq('task_type', $queryBuilder->createNamedParameter($task->getType())),
+                $queryBuilder->expr()->eq('task_name', $queryBuilder->createNamedParameter($task->getName())),
+                $queryBuilder->expr()->eq('checksum', $queryBuilder->createNamedParameter($task->getConfigurationChecksum()))
+            );
+        $queryBuilder->execute();
+    }
+
     public static function deleteProcessingInstructions($uid)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
