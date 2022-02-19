@@ -43,6 +43,16 @@ class FileRepository
         return $queryBuilder->execute();
     }
 
+    public static function getProcessingInstructions(int $maxResults = 100)
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
+        $queryBuilder->select('*')
+            ->from(self::TABLE)
+            ->setMaxResults($maxResults);
+
+        return $queryBuilder->execute()->fetchAllAssociative();
+    }
+
     public static function getProcessingInstructionsByUrl($url)
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);

@@ -42,9 +42,22 @@ RewriteCond %{DOCUMENT_ROOT}/$1.$3 !-f
 RewriteRule ^((fileadmin/_processed_|other-storage/_processed_)/.+)\.(gif|jpg|jpeg|png)$ %{ENV:CWD}index.php [L]
 ```
 
+### Processing queue (optional)
+
+Internally, a record for every deferred image is stored in the database table `tx_deferredimageprocessing_file`.
+To clean up this table or speed up processing of lesser used files the records therein can be processed using a command controller or scheduler task.
+This step is completely optional and not mandatory for the extension to work.
+
+```shell
+./typo3cms deferred_image_processing:process
+
+# Process limiting to 5 items
+./typo3cms deferred_image_processing:process 5
+```
+
 ## Documentation
 
-As the extension does everything itself automatically, there is not need
+As the extension does everything itself automatically, there is no need
 for further documentation. If you feel, a documentation could be helpful,
 please contact me or open an issue with your question.
 
