@@ -39,7 +39,7 @@ class ProcessCommand extends Command
         $io->title($this->getDescription());
 
         $limit = $input->getArgument('limit') ?: 10;
-        $verbose = $input->getOption('verbose') ?? false;
+        $verbose = $input->hasOption('verbose') && $input->getOption('verbose');
         $io->info(sprintf('Processing up to %d records...', $limit));
 
         $processingInstructionsResults = FileRepository::getProcessingInstructions($limit);
