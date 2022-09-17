@@ -2,7 +2,6 @@
 
 namespace WEBcoast\DeferredImageProcessing\Command;
 
-use Psr\Http\Message\ResponseFactoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +14,6 @@ use WEBcoast\DeferredImageProcessing\Resource\Processing\FileRepository;
 
 class ProcessCommand extends Command
 {
-
     protected function configure()
     {
         $this->setDescription('Process all entries in deferred image processing file list')
@@ -29,24 +27,34 @@ class ProcessCommand extends Command
     /**
      * Executes the command for showing sys_log entries
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return int error code
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-        $io->title($this->getDescription());
-
         $limit = $input->getArgument('limit') ?: 10;
         $verbose = $input->getOption('verbose') ?? false;
-        $io->info(sprintf('Processing up to %d records...', $limit));
+        $quiet = $input->getOption('quiet') ?? false;
+
+        $io = new SymfonyStyle($input, $output);
+        if (!$quiet) {
+            $io->title($this->getDescription());
+            if ($verbose) {
+                $io->info(sprintf('Processing up to %d records...', $limit));
+            }
+        }
 
         $processingInstructionsResults = FileRepository::getProcessingInstructions($limit);
-        $io->createProgressBar();
-        $io->progressStart(count($processingInstructionsResults));
+        if (!$quiet) {
+            $io->createProgressBar();
+            $io->progressStart(count($processingInstructionsResults));
+        }
         foreach ($processingInstructionsResults as $processingInstructions) {
-            $verbose && $io->info(sprintf('Processing file "%s"...', $processingInstructions['public_url']));
+            if (!$quiet && $verbose) {
+                $io->info(sprintf('Processing file "%s"...', $processingInstructions['public_url']));
+            }
             try {
                 $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($processingInstructions['storage']);
                 $configuration = unserialize($processingInstructions['configuration']);
@@ -54,24 +62,32 @@ class ProcessCommand extends Command
                 $processedFile = $storage->processFile(
                     GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($processingInstructions['source_file']),
                     $processingInstructions['task_type'] . '.' . $processingInstructions['task_name'],
-                    $configuration);
+                    $configuration
+                );
 
                 if ($processedFile->exists()) {
                     FileRepository::deleteProcessingInstructions($processingInstructions['uid']);
-                    $verbose && $io->success(sprintf('File "%s" processed successfully.', $processingInstructions['public_url']));
+                    if (!$quiet && $verbose) {
+                        $io->success(sprintf('File "%s" processed successfully.', $processingInstructions['public_url']));
+                    }
                 }
             } catch (FileDoesNotExistException $e) {
-                $io->warning(sprintf('Skipping error "%s"', $e->getMessage()));
+                if (!$quiet) {
+                    $io->warning(sprintf('Skipping error "%s"', $e->getMessage()));
+                }
                 FileRepository::deleteProcessingInstructions($processingInstructions['uid']);
             }
 
-            $io->progressAdvance();
+            if (!$quiet) {
+                $io->progressAdvance();
+            }
         }
 
-        $io->progressFinish();
+        if (!$quiet) {
+            $io->progressFinish();
+            $io->writeln('Done.');
+        }
 
-        $io->writeln('Done.');
         return Command::SUCCESS;
     }
-
 }
