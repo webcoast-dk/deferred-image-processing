@@ -5,6 +5,7 @@ namespace WEBcoast\DeferredImageProcessing\Resource\Processing;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use WEBcoast\DeferredImageProcessing\Utility\PathUtility;
 
 class FileRepository
 {
@@ -32,7 +33,7 @@ class FileRepository
         $queryBuilder->insert(self::TABLE)
             ->values([
                 'storage' => $queryBuilder->createNamedParameter($task->getSourceFile()->getStorage()->getUid() ,\PDO::PARAM_INT),
-                'public_url' => $queryBuilder->createNamedParameter($task->getTargetFile()->getPublicUrl()),
+                'public_url' => $queryBuilder->createNamedParameter(PathUtility::stripLeadingSlash($task->getTargetFile()->getPublicUrl())),
                 'source_file' => $queryBuilder->createNamedParameter($task->getSourceFile()->getUid(), \PDO::PARAM_INT),
                 'task_type' => $queryBuilder->createNamedParameter($task->getType()),
                 'task_name' => $queryBuilder->createNamedParameter($task->getName()),
@@ -58,7 +59,7 @@ class FileRepository
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
         $queryBuilder->select('*')
             ->from(self::TABLE)
-            ->where($queryBuilder->expr()->eq('public_url', $queryBuilder->createNamedParameter($url)));
+            ->where($queryBuilder->expr()->eq('public_url', $queryBuilder->createNamedParameter(PathUtility::stripLeadingSlash($url))));
 
         return $queryBuilder->execute()->fetch();
     }
@@ -67,7 +68,7 @@ class FileRepository
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE);
         $queryBuilder->update(self::TABLE)
-            ->set('public_url', $task->getTargetFile()->getPublicUrl())
+            ->set('public_url', PathUtility::stripLeadingSlash($task->getTargetFile()->getPublicUrl()))
             ->where(
                 $queryBuilder->expr()->eq('storage', $queryBuilder->createNamedParameter($task->getSourceFile()->getStorage()->getUid())),
                 $queryBuilder->expr()->eq('source_file', $queryBuilder->createNamedParameter($task->getSourceFile()->getUid())),
