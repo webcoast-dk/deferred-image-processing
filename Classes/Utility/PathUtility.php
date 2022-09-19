@@ -6,7 +6,7 @@ class PathUtility
 {
     /**
      * Public URLs returned from TYPO3 are inconsistent.
-     * Therefore we need to strip an optinal leading slash.
+     * Therefore, we need to strip an optional leading slash.
      *
      */
     public static function stripLeadingSlash(string $filename): string
