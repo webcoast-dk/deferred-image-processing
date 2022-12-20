@@ -20,8 +20,16 @@ class DeferredImageProcessor extends LocalImageProcessor
             && $task->getSourceFile()->getExtension() !== 'svg'
             && $task->getSourceFile()->getMimeType() !== 'application/pdf'
             && $task->getSourceFile()->getExtension() !== 'pdf'
+            && $task->getSourceFile()->getMimeType() !== 'application/msword'
+            && $task->getSourceFile()->getExtension() !== 'doc'
             && $task->getSourceFile()->getMimeType() !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             && $task->getSourceFile()->getExtension() !== 'docx'
+            && $task->getSourceFile()->getMimeType() !== 'application/application/vnd.ms-excel'
+            && $task->getSourceFile()->getExtension() !== 'xls'
+            && $task->getSourceFile()->getMimeType() !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            && $task->getSourceFile()->getExtension() !== 'xlsx'
+            && $task->getSourceFile()->getMimeType() !== 'application/vnd.ms-powerpoint'
+            && $task->getSourceFile()->getExtension() !== 'ppt'
             && $task->getSourceFile()->getMimeType() !== 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
             && $task->getSourceFile()->getExtension() !== 'pptx';
     }
