@@ -19,7 +19,11 @@ class DeferredImageProcessor extends LocalImageProcessor
             && $task->getSourceFile()->getMimeType() !== 'image/svg+xml'
             && $task->getSourceFile()->getExtension() !== 'svg'
             && $task->getSourceFile()->getMimeType() !== 'application/pdf'
-            && $task->getSourceFile()->getExtension() !== 'pdf';
+            && $task->getSourceFile()->getExtension() !== 'pdf'
+            && $task->getSourceFile()->getMimeType() !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            && $task->getSourceFile()->getExtension() !== 'docx'
+            && $task->getSourceFile()->getMimeType() !== 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            && $task->getSourceFile()->getExtension() !== 'pptx';
     }
 
     public function processTask(TaskInterface $task): void
