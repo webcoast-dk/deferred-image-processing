@@ -5,6 +5,7 @@ namespace WEBcoast\DeferredImageProcessing\Resource\Processing;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Imaging\ImageDimension;
+use TYPO3\CMS\Core\Imaging\ImageManipulation\Area;
 use TYPO3\CMS\Core\Resource\Processing\LocalImageProcessor;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 use TYPO3\CMS\Core\Resource\Processing\TaskTypeRegistry;
@@ -42,6 +43,15 @@ class DeferredImageProcessor extends LocalImageProcessor
                 return;
             }
 
+            $configuration = $task->getConfiguration();
+            if (isset($configuration['crop']) && !$configuration['crop'] instanceof Area) {
+                // If `crop` is not an `Area`, it is most probably the original crop string from the file (e.g. from imageLinkWrap)
+                // This is invalid and needs to be removed
+                unset($configuration['crop']);
+                // Create task with new configuration
+                $task = GeneralUtility::makeInstance(TaskTypeRegistry::class)->getTaskForType($task->getType() . '.' . $task->getName(), $task->getTargetFile(), $configuration);
+            }
+
             $imageDimensions = ImageDimension::fromProcessingTask($task);
             if ($imageDimensions->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width') && $imageDimensions->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height') && !$task->getConfiguration()['crop']) {
                 // If the target image dimensions are identical to the original file and no cropping is defined, do not process, but use the original file
@@ -49,7 +59,7 @@ class DeferredImageProcessor extends LocalImageProcessor
                 $task->getTargetFile()->setUsesOriginalFile();
             } else {
                 if (!FileRepository::hasProcessingInstructions($task)) {
-                    // If we got an empty processed file (not persisted yet), set the name
+                    // If we got an empty processed file (not persisted yet), set the name,
                     // so we can get the public url of the processed image.
                     if (!$task->getTargetFile()->isPersisted()) {
                         $task->getTargetFile()->setName($task->getTargetFileName());
