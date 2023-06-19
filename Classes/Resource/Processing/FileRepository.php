@@ -24,7 +24,7 @@ class FileRepository
                 $queryBuilder->expr()->eq('checksum', $queryBuilder->createNamedParameter($task->getConfigurationChecksum()))
             );
 
-        return $queryBuilder->execute()->fetchColumn(0) > 0;
+        return $queryBuilder->executeQuery()->fetchOne() > 0;
     }
 
     public static function setProcessingInstructions(TaskInterface $task)
@@ -41,7 +41,7 @@ class FileRepository
                 'checksum' => $queryBuilder->createNamedParameter($task->getConfigurationChecksum())
             ], false);
 
-        return $queryBuilder->execute();
+        return $queryBuilder->executeStatement();
     }
 
     public static function getProcessingInstructions(int $maxResults = 100)
@@ -51,7 +51,7 @@ class FileRepository
             ->from(self::TABLE)
             ->setMaxResults($maxResults);
 
-        return $queryBuilder->execute()->fetchAllAssociative();
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
     }
 
     public static function getProcessingInstructionsByUrl($url)
@@ -61,7 +61,7 @@ class FileRepository
             ->from(self::TABLE)
             ->where($queryBuilder->expr()->eq('public_url', $queryBuilder->createNamedParameter(PathUtility::stripLeadingSlash($url))));
 
-        return $queryBuilder->execute()->fetch();
+        return $queryBuilder->executeQuery()->fetchAssociative();
     }
 
     public static function updatePublicUrl(TaskInterface $task)
@@ -76,7 +76,7 @@ class FileRepository
                 $queryBuilder->expr()->eq('task_name', $queryBuilder->createNamedParameter($task->getName())),
                 $queryBuilder->expr()->eq('checksum', $queryBuilder->createNamedParameter($task->getConfigurationChecksum()))
             );
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     public static function deleteProcessingInstructions($uid)
@@ -85,6 +85,6 @@ class FileRepository
         $queryBuilder->delete(self::TABLE)
             ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)));
 
-        return $queryBuilder->execute();
+        return $queryBuilder->executeStatement();
     }
 }

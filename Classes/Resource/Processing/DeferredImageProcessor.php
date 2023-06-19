@@ -4,6 +4,7 @@ namespace WEBcoast\DeferredImageProcessing\Resource\Processing;
 
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
+use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Imaging\ImageDimension;
 use TYPO3\CMS\Core\Imaging\ImageManipulation\Area;
 use TYPO3\CMS\Core\Resource\Processing\LocalImageProcessor;
@@ -92,7 +93,7 @@ class DeferredImageProcessor extends LocalImageProcessor
      */
     protected function shouldDefer(TaskInterface $task): bool
     {
-        if (TYPO3_MODE === 'BE') {
+        if (ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isBackend()) {
             return false;
         }
 

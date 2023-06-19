@@ -22,6 +22,8 @@ class ImageProcessor implements MiddlewareInterface
             $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($processingInstructions['storage']);
             $configuration = unserialize($processingInstructions['configuration']);
             $configuration['deferred'] = true;
+            // Assign global TYPO3_REQUEST variable to make it available in the `DeferredImageProcessor`
+            $GLOBALS['TYPO3_REQUEST'] = $request;
             $processedFile = $storage->processFile(
                 GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($processingInstructions['source_file']),
                 $processingInstructions['task_type'] . '.' . $processingInstructions['task_name'],

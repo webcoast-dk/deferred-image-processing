@@ -1,6 +1,6 @@
 <?php
 
-$EM_CONF[$_EXTKEY] = array(
+$EM_CONF[$_EXTKEY] = [
     'title' => 'Deferred image processing',
     'description' => 'Handles image processing on request instead of during page generation',
     'category' => 'plugin',
@@ -9,12 +9,12 @@ $EM_CONF[$_EXTKEY] = array(
     'author_company' => 'WEBcoast',
     'state' => 'stable',
     'clearCacheOnLoad' => 0,
-    'version' => '1.1.0',
-    'constraints' => array(
-        'depends' => array(
-            'typo3' => '10.4.0-12.4.99'
-        ),
-        'conflicts' => array(),
-        'suggests' => array(),
-    ),
-);
+    'version' => '2.0.0',
+    'constraints' => [
+        'depends' => [
+            'typo3' => '11.5.0-12.4.99'
+        ],
+        'conflicts' => [],
+        'suggests' => [],
+    ],
+];
