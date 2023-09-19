@@ -16,6 +16,10 @@ class ImageProcessor implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        if('image/' !== substr($request->getHeaderLine('Accept'), 0, 6)) {
+            return $handler->handle($request);
+        }
+
         $path = PathUtility::stripLeadingSlash($request->getUri()->getPath());
 
         if (($processingInstructions = FileRepository::getProcessingInstructionsByUrl($path)) !== false) {
