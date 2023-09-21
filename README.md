@@ -27,19 +27,20 @@ If using the default htaccess file which is shipped with TYPO3, then there is a 
 of static files which are not found:
 
 ```apacheconf
-# Stop rewrite processing, if we are in the typo3/ directory or any other known directory
+# Stop rewrite processing, if we are in [..]
 # NOTE: Add your additional local storages here
-RewriteRule ^(?:typo3/|fileadmin/|typo3conf/|typo3temp/|uploads/|favicon\.ico) - [L]
+RewriteRule ^(?:fileadmin/|typo3conf/|typo3temp/|uploads/) - [L]
 ```
 
 But for this extension to work the request needs to be redirected to index.php and is then handled by a middleware.
 So make sure to add a rule like this *before* the blocking rule above:
 
 ```apacheconf
-# For EXT:deferred-image-processing
-# If a processed image is not found, then redirect to index.php and let the middleware create one on the fly.
-RewriteCond %{DOCUMENT_ROOT}/$1.$3 !-f
-RewriteRule ^((fileadmin/_processed_|other-storage/_processed_)/.+)\.(gif|jpg|jpeg|png)$ %{ENV:CWD}index.php [L]
+# EXT:deferred-image-processing
+  # If a processed image is not found, redirect to index.php and let the middleware create one on the fly.
+  RewriteCond %{HTTP_ACCEPT} ^image/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^[^/]+/_processed_/.+\.(?:gif|jpe?g|png)$ %{ENV:CWD}index.php [L]
 ```
 
 ### Processing queue (optional)
