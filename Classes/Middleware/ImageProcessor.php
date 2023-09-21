@@ -10,7 +10,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use WEBcoast\DeferredImageProcessing\Resource\Processing\FileRepository;
-use WEBcoast\DeferredImageProcessing\Utility\PathUtility;
 
 class ImageProcessor implements MiddlewareInterface
 {
@@ -20,9 +19,7 @@ class ImageProcessor implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $path = PathUtility::stripLeadingSlash($request->getUri()->getPath());
-
-        if (($processingInstructions = FileRepository::getProcessingInstructionsByUrl($path)) !== false) {
+        if (false !== ($processingInstructions = FileRepository::getProcessingInstructionsByUrl($request->getUri()->getPath()))) {
             $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($processingInstructions['storage']);
             $configuration = unserialize($processingInstructions['configuration']);
             $configuration['deferred'] = true;
