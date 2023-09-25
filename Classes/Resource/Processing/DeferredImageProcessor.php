@@ -17,10 +17,12 @@ class DeferredImageProcessor extends LocalImageProcessor
     {
         return $task->getType() === 'Image'
             && $task->getName() === 'CropScaleMask'
+            && (
+                str_starts_with($task->getSourceFile()->getMimeType(), 'image/')
+                || $task->getSourceFile()->getMimeType() === 'application/pdf'
+            )
             && $task->getSourceFile()->getMimeType() !== 'image/svg+xml'
-            && $task->getSourceFile()->getExtension() !== 'svg'
-            && $task->getSourceFile()->getMimeType() !== 'application/pdf'
-            && $task->getSourceFile()->getExtension() !== 'pdf';
+            && $task->getSourceFile()->getExtension() !== 'svg';
     }
 
     public function processTask(TaskInterface $task): void
@@ -36,9 +38,6 @@ class DeferredImageProcessor extends LocalImageProcessor
                 $task->setExecuted($localTask->isSuccessful());
             }
         } else {
-            if (!$this->canProcessTask($task)) {
-                throw new \InvalidArgumentException('Cannot process task of type "' . $task->getType() . '.' . $task->getName() . '"', 1350570621);
-            }
             if ($this->checkForExistingTargetFile($task)) {
                 return;
             }
@@ -53,7 +52,12 @@ class DeferredImageProcessor extends LocalImageProcessor
             }
 
             $imageDimensions = ImageDimension::fromProcessingTask($task);
-            if ($imageDimensions->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width') && $imageDimensions->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height') && !$task->getConfiguration()['crop']) {
+            if (
+                $imageDimensions->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width')
+                && $imageDimensions->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height')
+                && !$task->getConfiguration()['crop']
+                && $task->getSourceFile()->getMimeType() !== 'application/pdf'
+            ) {
                 // If the target image dimensions are identical to the original file and no cropping is defined, do not process, but use the original file
                 $task->setExecuted(true);
                 $task->getTargetFile()->setUsesOriginalFile();
