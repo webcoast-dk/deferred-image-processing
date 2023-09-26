@@ -2,9 +2,9 @@
 
 ## What does it do?
 
-The extension defers the image processing from during page generation to 
+The extension defers the image processing from during page generation to
 when the image is actually requested from the client (browser). When the image
-is processed and placed in the storage's processed folder, it will not be 
+is processed and placed in the storage's processed folder, it will not be
 processed again, until it is deleted or all processed images are cleared.
 
 This is useful on sites with lots of images on one page.
@@ -23,24 +23,27 @@ or from TYPO3 extension repository.
 A database update is necessary to create the processing queue table.
 
 ### Rewrite rules for apache
+
 If using the default htaccess file which is shipped with TYPO3, then there is a rule which stops all further processing
 of static files which are not found:
 
 ```apacheconf
-# Stop rewrite processing, if we are in the typo3/ directory or any other known directory
+# Stop rewrite processing, if we are in any other known directory
 # NOTE: Add your additional local storages here
-RewriteRule ^(?:typo3/|fileadmin/|typo3conf/|typo3temp/|uploads/|favicon\.ico) - [L]
+RewriteRule ^(?:fileadmin/|typo3conf/|typo3temp/|uploads/) - [L]
 ```
 
 But for this extension to work the request needs to be redirected to index.php and is then handled by a middleware.
 So make sure to add a rule like this *before* the blocking rule above:
 
 ```apacheconf
-# For EXT:deferred-image-processing
-# If a processed image is not found, then redirect to index.php and let the middleware create one on the fly.
-RewriteCond %{DOCUMENT_ROOT}/$1.$3 !-f
-RewriteRule ^((fileadmin/_processed_|other-storage/_processed_)/.+)\.(gif|jpg|jpeg|png)$ %{ENV:CWD}index.php [L]
+# EXT:deferred-image-processing
+  # If a processed image is not found, redirect to index.php and let the middleware create it on the fly.
+  RewriteCond %{HTTP_ACCEPT} ^image/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule /_processed_/.+_([0-9a-f]{10})\.(gif|jpe?g|png)$ %{ENV:CWD}index.php?dip[chk]=$1&dip[ext]=$2 [END]
 ```
+URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/typo3/blob/main/typo3/sysext/core/Classes/Resource/Processing/AbstractTask.php#L95-L115)
 
 ### Processing queue (optional)
 
@@ -49,9 +52,10 @@ To clean up this table or speed up processing of lesser used files the records t
 This step is completely optional and not mandatory for the extension to work.
 
 ```shell
+# Process limiting to 10 items
 ./typo3cms deferred_image_processing:process
 
-# Process limiting to 5 items
+# Process limiting to  5 items
 ./typo3cms deferred_image_processing:process 5
 ```
 
@@ -68,6 +72,7 @@ and provide a pull request with your changes. If you don't have the resources
 or knowledge, open an issue.
 
 ## License
+
 © 2020, WEBcoast
 
 This program is free software: you can redistribute it and/or modify it under
