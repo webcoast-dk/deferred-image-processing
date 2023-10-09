@@ -20,12 +20,16 @@ class DeferredImage extends \TYPO3\CMS\Core\Imaging\GraphicalFunctions implement
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
-        if (!isset($queryParams['dip'])) {
+        if (!( isset($queryParams['dip']) || !((bool) ($queryParams['dip'] = [])) )
+        ||  'image/' !== substr($request->getHeaderLine('Accept'), 0, 6) // fallback ^1
+        ) {
             return $handler->handle($request);
         }
 
         $match = $queryParams['dip'];
-        if (!isset($match['chk'], $match['ext']) || !in_array($match['ext'], $this->webImageExt)) {
+        if (!( isset($match['chk'], $match['ext']) && in_array($match['ext'], $this->webImageExt) )
+        &&  !preg_match('/_(?<chk>[0-9a-f]{10})\.(?:'.implode('|',$this->webImageExt).')$/', $request->getUri()->getPath(), $match) // fallback ^1
+        ) {
             return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, '[510] DeferredImage');
         }
 
