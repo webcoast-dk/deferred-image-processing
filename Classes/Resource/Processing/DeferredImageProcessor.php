@@ -75,6 +75,7 @@ class DeferredImageProcessor extends LocalImageProcessor
         if (!$task->getConfiguration()['crop']
         &&  $imageDimensions->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width')
         &&  $imageDimensions->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height')
+        &&  $task->getTargetFile()->getExtension() === $task->getTargetFile()->getOriginalFile()->getExtension()
         ) {
             // If the target image dimensions are identical to the original file and no cropping is defined, do not process, but use the original file
             $task->setExecuted(true);// keep!
