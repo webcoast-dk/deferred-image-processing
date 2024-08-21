@@ -14,6 +14,8 @@ processes and thereby to multiple CPU cores.
 
 ## Installation & configuration
 
+https://github.com/webcoast-dk/deferred-image-processing/blob/release/2.0/composer.json#L17-L18
+
 The extension is available from packagist.org
 ```sh
 composer require webcoast/deferred-image-processing
@@ -43,7 +45,7 @@ So make sure to add a rule like this *before* the blocking rule above:
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule /_processed_/.+_([0-9a-f]{10})\.(gif|jpe?g|png)$ %{ENV:CWD}index.php?dip[chk]=$1&dip[ext]=$2 [END]
 ```
-URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/typo3/blob/main/typo3/sysext/core/Classes/Resource/Processing/AbstractTask.php#L95-L115)
+URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/typo3/blob/12.4/typo3/sysext/core/Classes/Resource/Processing/AbstractTask.php#L79-L103)
 
 ### Processing queue (optional)
 
