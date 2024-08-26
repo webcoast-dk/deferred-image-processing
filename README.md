@@ -35,15 +35,14 @@ of static files which are not found:
 RewriteRule ^(?:fileadmin/|typo3conf/|typo3temp/|uploads/) - [L]
 ```
 
-But for this extension to work the request needs to be redirected to index.php and is then handled by a middleware.
+But for this extension to process the request - if no prepared image was found - needs to be redirected to `index.php` and is then handled by the middleware on the fly.
 So make sure to add a rule like this *before* the blocking rule above:
 
 ```apacheconf
-# EXT:deferred-image-processing
-  # If a processed image is not found, redirect to index.php and let the middleware create it on the fly.
+  # EXT:deferred-image-processing
   RewriteCond %{HTTP_ACCEPT} ^image/
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule /_processed_/.+_([0-9a-f]{10})\.(gif|jpe?g|png)$ %{ENV:CWD}index.php?dip[chk]=$1&dip[ext]=$2 [END]
+  RewriteRule /_processed_/.+_([0-9a-f]{10})\.([a-z]+)$ %{ENV:CWD}index.php?dip[chk]=$1&dip[ext]=$2 [END]
 ```
 URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/typo3/blob/12.4/typo3/sysext/core/Classes/Resource/Processing/AbstractTask.php#L79-L103)
 
