@@ -118,6 +118,6 @@ class DeferredImageProcessor extends LocalImageProcessor
             return false;
         }
 
-        return !$context->getAspect('backend.user')->isLoggedIn();
+        return true;#!$context->getAspect('backend.user')->isLoggedIn();
     }
 }
