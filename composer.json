@@ -7,7 +7,7 @@
     "license": "GPL-3.0-or-later",
     "extra": {
         "branch-alias": {
-            "dev-release/2.0": "2.0.x-dev"
+            "dev-main": "2.0.x-dev"
         },
         "typo3/cms": {
             "extension-key": "deferred_image_processing"
