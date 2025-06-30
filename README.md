@@ -43,7 +43,8 @@ So make sure to add a rule like this *before* the blocking rule above:
 
 ```apacheconf
   # EXT:deferred-image-processing
-  RewriteCond %{HTTP_ACCEPT} ^image/
+  # NOTE: Speed up ^Production w/ ..
+  #RewriteCond %{HTTP_ACCEPT} ^image/
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule /_processed_/.+_([0-9a-f]{10})\.([a-z]+)$ %{ENV:CWD}index.php?dip[chk]=$1&dip[ext]=$2 [END]
 ```
