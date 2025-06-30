@@ -71,10 +71,10 @@ class DeferredImageProcessor extends LocalImageProcessor
             );
         }
 
-        $imageDimensions = ImageDimension::fromProcessingTask($task);
+        $imageDimension = ImageDimension::fromProcessingTask($task);
         if (!$task->getConfiguration()['crop']
-        &&  $imageDimensions->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width')
-        &&  $imageDimensions->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height')
+        &&  $imageDimension->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width')
+        &&  $imageDimension->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height')
         &&  $task->getTargetFile()->getExtension() === $task->getTargetFile()->getOriginalFile()->getExtension()
         ) {
             // If the target image dimensions are identical to the original file and no cropping is defined, do not process, but use the original file
@@ -87,8 +87,8 @@ class DeferredImageProcessor extends LocalImageProcessor
         $task->setExecuted(true);// keep!
         $task->getTargetFile()->setName($task->getTargetFileName());
         $task->getTargetFile()->updateProperties([
-            'width' => $imageDimensions->getWidth(),
-            'height' => $imageDimensions->getHeight(),
+            'width' => $imageDimension->getWidth(),
+            'height' => $imageDimension->getHeight(),
             'checksum' => $task->getConfigurationChecksum()
         ]);
     }
@@ -118,6 +118,6 @@ class DeferredImageProcessor extends LocalImageProcessor
             return false;
         }
 
-        return true;#!$context->getAspect('backend.user')->isLoggedIn();
+        return true;
     }
 }
