@@ -14,7 +14,7 @@ processes and thereby to multiple CPU cores.
 
 ## Installation & configuration
 
-https://github.com/webcoast-dk/deferred-image-processing/blob/release/2.0/composer.json#L17-L18
+https://github.com/webcoast-dk/deferred-image-processing/blob/a4e2a47347b1de2745a5468b079b554813950840/composer.json#L17-L18
 
 The extension is available from packagist.org
 ```sh
@@ -22,11 +22,16 @@ composer require webcoast/deferred-image-processing
 ```
 or from TYPO3 extension repository.
 
-A database update is necessary to create the processing queue table.
+A database update is necessary to create the processing column `sys_file_processedfile.processed`.
 
-### Rewrite rules for apache
+```sh
+vendor/bin/typo3 database:updateschema
+```
 
-If using the default htaccess file which is shipped with TYPO3, then there is a rule which stops all further processing
+### RewriteRule for `apache`
+
+If using the default htaccess file which is shipped with TYPO3,
+then there is a rule which stops all further processing
 of static files which are not found:
 
 ```apacheconf
@@ -46,6 +51,15 @@ So make sure to add a rule like this *before* the blocking rule above:
 ```
 URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/typo3/blob/12.4/typo3/sysext/core/Classes/Resource/Processing/AbstractTask.php#L79-L103)
 
+### RewriteRule for `nginx`
+
+```
+  # EXT:deferred-image-processing
+  location ~ /_processed_/.+_([0-9a-f]{10})\.([a-z]+)$ {
+    try_files $uri /index.php?dip[chk]=$1&dip[ext]=$2;
+  }
+```
+
 ### Processing queue (optional)
 
 Internally, a record for every deferred image is stored in the database table `tx_deferredimageprocessing_file`.
@@ -54,10 +68,10 @@ This step is completely optional and not mandatory for the extension to work.
 
 ```shell
 # Process limiting to 10 items
-./typo3cms deferred_image_processing:process
+vendor/bin/typo3 deferred_image_processing:process
 
 # Process limiting to  5 items
-./typo3cms deferred_image_processing:process 5
+vendor/bin/typo3 deferred_image_processing:process 5
 ```
 
 ## Documentation
