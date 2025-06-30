@@ -1,7 +1,16 @@
 services:
-  WEBcoast\DeferredImageProcessing\Command\ProcessCommand:
-    tags:
-      - name: 'console.command'
-        command: 'deferred_image_processing:process'
-        description: 'Process all entries in deferred image processing file list'
-        hidden: false
+   _defaults:
+      autowire: true
+      autoconfigure: true
+      public: false
+      
+      # Register the command to process deferred image processing entries
+   WEBcoast\DeferredImageProcessing\Command\ProcessCommand:
+      tags:
+         -  name: 'console.command'
+            command: 'deferred_image_processing:process'
+            description: 'Process all entries in deferred image processing file list'
+            hidden: false
+
+   WEBcoast\DeferredImageProcessing\Resource\Processing\DeferredImageProcessor:
+      public: true

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WEBcoast\DeferredImageProcessing\Resource\Processing;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\ApplicationType;
@@ -13,10 +14,17 @@ use TYPO3\CMS\Core\Resource\Processing\LocalImageProcessor;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 use TYPO3\CMS\Core\Resource\Processing\TaskTypeRegistry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use WEBcoast\DeferredImageProcessing\Event\ShouldDeferEvent;
 
-# https://api.typo3.org/11.5/_deferred_backend_image_processor_8php_source.html#l00034
 class DeferredImageProcessor extends LocalImageProcessor
 {
+    protected EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     public function canProcessTask(TaskInterface $task): bool
     {
         return ($GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface
@@ -118,6 +126,9 @@ class DeferredImageProcessor extends LocalImageProcessor
             return false;
         }
 
-        return true;
+        $shouldDeferEvent = GeneralUtility::makeInstance(ShouldDeferEvent::class, $task, true);
+        $this->eventDispatcher->dispatch($shouldDeferEvent);
+
+        return $shouldDeferEvent->getShouldDefer();
     }
 }
