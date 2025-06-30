@@ -10,14 +10,14 @@ use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 
 class ShouldDeferEvent
 {
-    protected bool $shouldDefer;
-
     protected TaskInterface $task;
 
-    public function __construct(bool $shouldDefer, TaskInterface $task)
+    protected bool $shouldDefer;
+
+    public function __construct(TaskInterface $task, bool $shouldDefer)
     {
-        $this->shouldDefer = $shouldDefer;
         $this->task = $task;
+        $this->shouldDefer = $shouldDefer;
     }
 
     public function getShouldDefer(): bool

@@ -126,7 +126,7 @@ class DeferredImageProcessor extends LocalImageProcessor
             return false;
         }
 
-        $shouldDeferEvent = GeneralUtility::makeInstance(ShouldDeferEvent::class, true, $task);
+        $shouldDeferEvent = GeneralUtility::makeInstance(ShouldDeferEvent::class, $task, true);
         $this->eventDispatcher->dispatch($shouldDeferEvent);
 
         return $shouldDeferEvent->getShouldDefer();
