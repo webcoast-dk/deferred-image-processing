@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 
 class ShouldDeferEvent
 {
-    protected bool $shouldDefer = false;
+    protected bool $shouldDefer;
 
     protected TaskInterface $task;
 
