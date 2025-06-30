@@ -14,8 +14,6 @@ processes and thereby to multiple CPU cores.
 
 ## Installation & configuration
 
-https://github.com/webcoast-dk/deferred-image-processing/blob/a4e2a47347b1de2745a5468b079b554813950840/composer.json#L17-L18
-
 The extension is available from packagist.org
 ```sh
 composer require webcoast/deferred-image-processing
@@ -25,7 +23,7 @@ or from TYPO3 extension repository.
 A database update is necessary to create the processing column `sys_file_processedfile.processed`.
 
 ```sh
-vendor/bin/typo3 database:updateschema
+./vendor/bin/typo3 database:updateschema
 ```
 
 ### RewriteRule for `apache`
@@ -62,16 +60,19 @@ URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/ty
 
 ### Processing queue (optional)
 
-Internally, a record for every deferred image is stored in the database table `tx_deferredimageprocessing_file`.
-To clean up this table or speed up processing of lesser used files the records therein can be processed using a command controller or scheduler task.
+The deferred images are marked in the `sys_file_processedfile` table by setting the
+`processed` column to `0`. To process deferred images in the background, you can use
+the `deferred_image_processing:process` command, which can be run with a cronjob or
+be executed via the TYPO3 CMS scheduler.
+
 This step is completely optional and not mandatory for the extension to work.
 
 ```shell
 # Process limiting to 10 items
-vendor/bin/typo3 deferred_image_processing:process
+./vendor/bin/typo3 deferred_image_processing:process
 
 # Process limiting to  5 items
-vendor/bin/typo3 deferred_image_processing:process 5
+./vendor/bin/typo3 deferred_image_processing:process 5
 ```
 
 ## Documentation
