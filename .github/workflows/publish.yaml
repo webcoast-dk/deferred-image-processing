@@ -19,24 +19,6 @@ jobs:
                       exit 1
                     fi
 
-            -   name: Get version
-                id: get-version
-                run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
-
-
-            -   name: Get comment
-                id: get-comment
-                env:
-                    RELEASE_BODY: ${{ github.event.release.body }}
-                run: |
-                    comment="$RELEASE_BODY"
-                    
-                    if [[ -z "${comment// }" ]]; then
-                     echo "comment=Released version ${{ steps.get-version.outputs.version }}" >> $GITHUB_OUTPUT
-                    else
-                      echo "comment=$comment" >> $GITHUB_OUTPUT
-                    fi
-
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
@@ -48,4 +30,14 @@ jobs:
                 run: composer global require typo3/tailor --prefer-dist --no-progress --no-suggest
 
             -   name: Publish to TER
-                run: php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ steps.get-comment.outputs.comment }}" ${{ steps.get-version.outputs.version }}
+                env:
+                    RELEASE_BODY: ${{ github.event.release.body }}
+                run: |
+                    version=${GITHUB_REF/refs\/tags\/v/} 
+                    comment="$RELEASE_BODY"
+                    
+                    if [[ -z "${comment// }" ]]; then
+                     comment="Released version ${{ steps.get-version.outputs.version }}"
+                    fi
+                    
+                    php ~/.composer/vendor/bin/tailor ter:publish --comment "$comment" "$version"
