@@ -10,12 +10,13 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
 
-class DeferredImage extends \TYPO3\CMS\Core\Imaging\GraphicalFunctions implements MiddlewareInterface
+class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -37,8 +38,8 @@ class DeferredImage extends \TYPO3\CMS\Core\Imaging\GraphicalFunctions implement
             ->from('sys_file_processedfile')
             ->where($queryBuilder->expr()->eq('checksum', $queryBuilder->createNamedParameter($match['chk'])))
             ->executeQuery()
-            ->fetchAssociative()
-        ;
+            ->fetchAssociative();
+
         if (!$databaseRow) {
             return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, '[404] DeferredImage');
         }
@@ -50,27 +51,21 @@ class DeferredImage extends \TYPO3\CMS\Core\Imaging\GraphicalFunctions implement
         // Assign global TYPO3_REQUEST variable to make it available in the `DeferredImageProcessor`
         $GLOBALS['TYPO3_REQUEST'] = $request;
 
-        # https://api.typo3.org/11.5/core_2_classes_2_resource_2_file_8php_source.html#l00252
-        # https://api.typo3.org/11.5/_resource_storage_8php_source.html#l01428
-        # https://api.typo3.org/11.5/_file_processing_service_8php_source.html#l00079
-        # https://api.typo3.org/11.5/_processed_file_repository_8php_source.html#l00230
         $processedFile = GeneralUtility::makeInstance(ResourceFactory::class)
-                                                          ->getFileObject((int)$databaseRow['original'])
-                                                              ->process($databaseRow['task_type'], $configuration)
-        ;
+            ->getFileObject((int) $databaseRow['original'])
+            ->process($databaseRow['task_type'], $configuration);
+
         if ($processedFile->exists()) {
             $queryBuilder = $connectionPool->getQueryBuilderForTable('sys_file_processedfile');
             $queryBuilder
                 ->update('sys_file_processedfile')
                 ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($databaseRow['uid'])))
                 ->set('processed', true)
-                ->executeStatement()
-            ;
+                ->executeStatement();
         } else {
             GeneralUtility::makeInstance(LogManager::class)
                 ->getLogger(__CLASS__)
-                ->error(sprintf('%s:%s could not be processed!', $databaseRow['uid'], $databaseRow['identifier']))
-            ;
+                ->error(sprintf('%s:%s could not be processed!', $databaseRow['uid'], $databaseRow['identifier']));
             $processedFile = $processedFile->getOriginalFile();
         }
 
@@ -78,8 +73,7 @@ class DeferredImage extends \TYPO3\CMS\Core\Imaging\GraphicalFunctions implement
             ->createResponse()
             ->withStatus(200)
             ->withHeader('Content-Type', $processedFile->getMimeType())
-            ->withHeader('Content-Length', (string)$processedFile->getSize())
-            ;
+            ->withHeader('Content-Length', (string) $processedFile->getSize());
         $response->getBody()->write($processedFile->getContents());
 
         return $response;
