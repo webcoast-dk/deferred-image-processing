@@ -7,15 +7,16 @@
     "license": "GPL-3.0-or-later",
     "extra": {
         "branch-alias": {
-            "dev-main": "2.0.x-dev"
+            "dev-main": "3.0.x-dev"
         },
         "typo3/cms": {
             "extension-key": "deferred_image_processing"
         }
     },
     "require": {
-        "php": "^7.4 || ^8.0",
-        "typo3/cms-core": "^11.5 || ^12.4"
+        "php": "^8.1",
+        "typo3/cms-core": "^12.4 || ^13.4",
+        "typo3/cms-frontend": "^12.4 || ^13.4"
     },
     "autoload": {
         "psr-4": {

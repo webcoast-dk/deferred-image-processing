@@ -6,6 +6,7 @@ namespace WEBcoast\DeferredImageProcessing\Resource\Processing;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Imaging\ImageDimension;
@@ -16,6 +17,7 @@ use TYPO3\CMS\Core\Resource\Processing\TaskTypeRegistry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use WEBcoast\DeferredImageProcessing\Event\ShouldDeferEvent;
 
+#[Autoconfigure(public: true)]
 class DeferredImageProcessor extends LocalImageProcessor
 {
     protected EventDispatcherInterface $eventDispatcher;
@@ -34,8 +36,7 @@ class DeferredImageProcessor extends LocalImageProcessor
             && $task->getSourceFile()->getProperty('width') > 0
             && $task->getSourceFile()->getProperty('height') > 0
             && $task->getSourceFile()->getMimeType() !== 'image/svg+xml'
-            && $task->getSourceFile()->getMimeType() !== 'application/pdf'
-        ;
+            && $task->getSourceFile()->getMimeType() !== 'application/pdf';
     }
 
     public function processTask(TaskInterface $task): void
@@ -81,9 +82,9 @@ class DeferredImageProcessor extends LocalImageProcessor
 
         $imageDimension = ImageDimension::fromProcessingTask($task);
         if (!$task->getConfiguration()['crop']
-        &&  $imageDimension->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width')
-        &&  $imageDimension->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height')
-        &&  $task->getTargetFile()->getExtension() === $task->getTargetFile()->getOriginalFile()->getExtension()
+            && $imageDimension->getWidth() === $task->getTargetFile()->getOriginalFile()->getProperty('width')
+            && $imageDimension->getHeight() === $task->getTargetFile()->getOriginalFile()->getProperty('height')
+            && $task->getTargetFile()->getExtension() === $task->getTargetFile()->getOriginalFile()->getExtension()
         ) {
             // If the target image dimensions are identical to the original file and no cropping is defined, do not process, but use the original file
             $task->setExecuted(true);// keep!
