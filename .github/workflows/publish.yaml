@@ -30,7 +30,6 @@ jobs:
                     RELEASE_BODY: ${{ github.event.release.body }}
                 run: |
                     comment="$RELEASE_BODY"
-                    comment="${{ github.event.release.body }}"
                     comment="${comment//'%'/'%25'}"
                     comment="${comment//'`'/''}"
                     comment="${comment//$'\n'/'%0A'}"
