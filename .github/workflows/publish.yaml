@@ -37,7 +37,7 @@ jobs:
                     comment="$RELEASE_BODY"
                     
                     if [[ -z "${comment// }" ]]; then
-                     comment="Released version ${{ steps.get-version.outputs.version }}"
+                     comment="Released version $version"
                     fi
                     
                     php ~/.composer/vendor/bin/tailor ter:publish --comment "$comment" "$version"
