@@ -30,10 +30,6 @@ jobs:
                     RELEASE_BODY: ${{ github.event.release.body }}
                 run: |
                     comment="$RELEASE_BODY"
-                    comment="${comment//'%'/'%25'}"
-                    comment="${comment//'`'/''}"
-                    comment="${comment//$'\n'/'%0A'}"
-                    comment="${comment//$'\r'/'%0D'}"
                     
                     if [[ -z "${comment// }" ]]; then
                      echo "comment=Released version ${{ steps.get-version.outputs.version }}" >> $GITHUB_OUTPUT
