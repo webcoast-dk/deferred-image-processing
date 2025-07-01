@@ -12,6 +12,24 @@ Instead of generating one image after another, leading to a massive delay in
 page generation speed, the image processing load is split to the available PHP
 processes and thereby to multiple CPU cores.
 
+## TYPO3 CMS & PHP version compatibility
+
+### TYPO3 CMS
+
+| Extension ↓ / TYPO3 → | 10.4 | 11.5 | 12.4 |
+|-----------------------|:----:|:----:|:----:|
+| 1.0.0                 |  ✅  |  ❌  |  ❌  |
+| 1.1.0                 |  ✅  |  ✅  |  ❌  |
+| 2.0.0                 |  ❌  |  ✅  |  ✅  |
+
+### PHP
+
+| Extension ↓ / PHP → | 7.2  | 7.3  | 7.4  | 8.0  | 8.1  | 8.2  | 8.3  | 8.4  |
+|---------------------|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+| 1.0.0               |  ✅  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
+| 1.1.0               |  ✅  |  ✅  |  ✅  |  ✅  |  ✅  |  ✅  |  ✅  |  ✅  |
+| 2.0.0               |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ✅  |  ✅  |  ✅  |
+
 ## Installation & configuration
 
 The extension is available from packagist.org
@@ -52,7 +70,7 @@ URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/ty
 
 ### RewriteRule for `nginx`
 
-```
+```nginx
   # EXT:deferred-image-processing
   location ~ /_processed_/.+_([0-9a-f]{10})\.([a-z]+)$ {
     try_files $uri /index.php?dip[chk]=$1&dip[ext]=$2;
