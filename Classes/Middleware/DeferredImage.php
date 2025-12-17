@@ -11,6 +11,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -27,12 +28,7 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $webImageExt = [...$this->webImageExt, 'avif'];
-        if (
-            !isset($match['chk'], $match['ext'])
-            || ($match['ext'] === 'avif' && !$this->avifSupportAvailable())
-            || !in_array($match['ext'], $webImageExt)
-        ) {
+        if (!isset($match['chk'], $match['ext']) || !$this->isImageExtensionSupported($match['ext'])) {
             return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, '[510] DeferredImage');
         }
 
@@ -82,5 +78,15 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
         $response->getBody()->write($processedFile->getContents());
 
         return $response;
+    }
+
+    protected function isImageExtensionSupported(string $ext): bool
+    {
+        $typo3Version = GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion();
+        if ($typo3Version < 13) {
+            return in_array($ext, $this->webImageExt);
+        }
+
+        return ($ext === 'avif' && $this->avifSupportAvailable()) || in_array($ext, $this->webImageExt);
     }
 }
