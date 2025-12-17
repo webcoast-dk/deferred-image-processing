@@ -27,7 +27,12 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        if (!isset($match['chk'], $match['ext']) || !in_array($match['ext'], $this->webImageExt)) {
+        $webImageExt = [...$this->webImageExt, 'avif'];
+        if (
+            !isset($match['chk'], $match['ext'])
+            || ($match['ext'] === 'avif' && !$this->avifSupportAvailable())
+            || !in_array($match['ext'], $webImageExt)
+        ) {
             return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, '[510] DeferredImage');
         }
 
