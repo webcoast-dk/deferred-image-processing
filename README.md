@@ -74,7 +74,7 @@ URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/ty
 
 ```nginx
   # EXT:deferred-image-processing
-  location ~ /_processed_/.+_([0-9a-f]{10})\.([a-z]+)$ {
+  location ~ "/_processed_/.+_([0-9a-f]{10})\.([a-z]+)$" {
     try_files $uri /index.php?dip[chk]=$1&dip[ext]=$2;
   }
 ```
