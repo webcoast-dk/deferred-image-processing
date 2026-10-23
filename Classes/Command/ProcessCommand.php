@@ -11,6 +11,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\FileProcessingAspect;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -58,6 +60,7 @@ class ProcessCommand extends Command
 
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+        GeneralUtility::makeInstance(Context::class)->setAspect('fileProcessing', new FileProcessingAspect(false));
 
         $queryBuilder = $connectionPool->getQueryBuilderForTable('sys_file_processedfile');
         $databaseRows = $queryBuilder
@@ -86,7 +89,6 @@ class ProcessCommand extends Command
             }
             try {
                 $configuration = unserialize($databaseRow['configuration']);
-                $configuration['deferred'] = true;
 
                 $processedFile = $resourceFactory
                     ->getFileObject((int)$databaseRow['original'])

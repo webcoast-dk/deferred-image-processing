@@ -96,6 +96,17 @@ This step is completely optional and not mandatory for the extension to work.
 ./vendor/bin/typo3 deferred_image_processing:process 5
 ```
 
+### Updating from 3.0.4 or earlier
+
+Up to version 3.0.4, rendering a deferred image created a second record in `sys_file_processedfile`,
+and the processing queue rendered its images to files that were never requested. The upgrade wizard
+`deferredImageProcessing_removeDuplicates` removes these records and files, but keeps files still
+used by another record. On large tables, run it on the command line:
+
+```shell
+./vendor/bin/typo3 upgrade:run deferredImageProcessing_removeDuplicates
+```
+
 ## Documentation
 
 As the extension does everything itself automatically, there is no need

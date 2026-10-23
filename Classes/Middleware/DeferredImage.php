@@ -9,6 +9,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\FileProcessingAspect;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
 use TYPO3\CMS\Core\Information\Typo3Version;
@@ -45,9 +47,10 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
             return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, '[404] DeferredImage');
         }
 
-        // Add `deferred` to check at `DeferredImageProcessor`
+        // Disable deferring through the context, as the configuration is part of the processed file's lookup and
+        // file name and must therefore stay exactly as it is stored
+        GeneralUtility::makeInstance(Context::class)->setAspect('fileProcessing', new FileProcessingAspect(false));
         $configuration = unserialize($databaseRow['configuration']);
-        $configuration['deferred'] = true;
 
         // Assign global TYPO3_REQUEST variable to make it available in the `DeferredImageProcessor`
         $GLOBALS['TYPO3_REQUEST'] = $request;
