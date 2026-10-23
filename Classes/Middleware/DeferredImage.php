@@ -84,7 +84,8 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
     {
         $typo3Version = GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion();
         if ($typo3Version < 13) {
-            return in_array($ext, $this->webImageExt);
+            // TYPO3 12 processes webp, but only lists it in `$webImageExt` from 13 on
+            return in_array($ext, [...$this->webImageExt, 'webp']);
         }
 
         return ($ext === 'avif' && $this->avifSupportAvailable()) || in_array($ext, $this->webImageExt);
