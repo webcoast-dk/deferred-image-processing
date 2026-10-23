@@ -46,6 +46,14 @@ A database update is necessary to create the processing column `sys_file_process
 ./vendor/bin/typo3 database:updateschema
 ```
 
+When updating from 3.0.4 or earlier, the existing processed files are still in the processing
+queue afterwards. The upgrade wizard `deferredImageProcessing_dequeueExistingFiles` removes them,
+on large tables preferably on the command line:
+
+```sh
+./vendor/bin/typo3 upgrade:run deferredImageProcessing_dequeueExistingFiles
+```
+
 ### RewriteRule for `apache`
 
 If using the default htaccess file which is shipped with TYPO3,

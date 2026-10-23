@@ -95,10 +95,12 @@ class DeferredImageProcessor extends LocalImageProcessor
 
         $task->setExecuted(true);// keep!
         $task->getTargetFile()->setName($task->getTargetFileName());
+        // `processed` is NULL for all records not created by this processor, so only deferred images are queued
         $task->getTargetFile()->updateProperties([
             'width' => $imageDimension->getWidth(),
             'height' => $imageDimension->getHeight(),
-            'checksum' => $task->getConfigurationChecksum()
+            'checksum' => $task->getConfigurationChecksum(),
+            'processed' => 0,
         ]);
     }
 
