@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
 use TYPO3\CMS\Core\Information\Typo3Version;
@@ -29,7 +30,7 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
         }
 
         if (!isset($match['chk'], $match['ext']) || !$this->isImageExtensionSupported($match['ext'])) {
-            return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, '[510] DeferredImage');
+            return $this->notFound($request, '[510] DeferredImage');
         }
 
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
@@ -42,7 +43,7 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
             ->fetchAssociative();
 
         if (!$databaseRow) {
-            return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, '[404] DeferredImage');
+            return $this->notFound($request, '[404] DeferredImage');
         }
 
         // Add `deferred` to check at `DeferredImageProcessor`
@@ -78,6 +79,16 @@ class DeferredImage extends GraphicalFunctions implements MiddlewareInterface
         $response->getBody()->write($processedFile->getContents());
 
         return $response;
+    }
+
+    protected function notFound(ServerRequestInterface $request, string $message): ResponseInterface
+    {
+        // The site's error handling renders a full page per request, which is wasted on a missing image
+        if ((bool) GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('deferred_image_processing', 'plainNotFoundResponse')) {
+            return GeneralUtility::makeInstance(ResponseFactoryInterface::class)->createResponse(404);
+        }
+
+        return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, $message);
     }
 
     protected function isImageExtensionSupported(string $ext): bool

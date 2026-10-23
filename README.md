@@ -79,6 +79,21 @@ URL/HASH ref. @ [`Resource/Processing/AbstractTask`](https://github.com/TYPO3/ty
   }
 ```
 
+### Plain 404 response (optional)
+
+Requests to processed images, which are neither on disk nor known in `sys_file_processedfile`, are
+answered with the site's 404 error handling. With a page-based error handler (`errorHandler: Page`),
+every such request renders the full error page in a sub-request, only to deliver HTML to an `<img>` tag.
+On sites with a lot of traffic to missing images (outdated links, crawlers, cleared processed files),
+this is expensive.
+
+Enable `plainNotFoundResponse` in the extension configuration (Admin Tools > Settings > Extension
+Configuration) to answer these requests with an empty `404` response instead:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['deferred_image_processing']['plainNotFoundResponse'] = true;
+```
+
 ### Processing queue (optional)
 
 The deferred images are marked in the `sys_file_processedfile` table by setting the

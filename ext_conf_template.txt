@@ -1,0 +1,2 @@
+# cat=basic; type=boolean; label=Plain 404 response:Answer requests for unknown processed images with an empty 404 response instead of the site's error page. Recommended for sites with a page-based 404 error handler and many requests to missing images.
+plainNotFoundResponse = 0
